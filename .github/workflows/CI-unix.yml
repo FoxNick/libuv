@@ -54,7 +54,7 @@ jobs:
       - name: Package Artifacts
         run: |
           mkdir -p build–${{ matrix.abi }}/{lib,include}
-          cp build-${{ matrix.abi }}/libuv.a build–${{ matrix.abi }}/lib/
+          cp build/build-${{ matrix.abi }}/libuv.a build–${{ matrix.abi }}/lib/
           cp -r include/* build–${{ matrix.abi }}/include/  # 同步头文件
           zip -r libuv-android-${{ matrix.abi }}.zip build–${{ matrix.abi }}/
 
