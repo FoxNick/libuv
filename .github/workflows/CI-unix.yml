@@ -37,7 +37,7 @@ jobs:
       # 配置编译环境
       - name: Configure CMake
         run: |
-          cmake -B build-${{ matrix.abi }} \
+          cmake -B build/${{ matrix.abi }} \
             -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release \
             -DANDROID_ABI="${{ matrix.abi }}" \
@@ -48,7 +48,7 @@ jobs:
       # 编译静态库
       - name: Build Static Library
         run: |
-          cmake --build build-${{ matrix.abi }} --target uv
+          cmake --build build/${{ matrix.abi }} --target uv
 
       # 收集输出文件
       - name: Package Artifacts
