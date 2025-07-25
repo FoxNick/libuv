@@ -48,7 +48,7 @@ jobs:
       # 编译静态库
       - name: Build Static Library
         run: |
-          cmake --build build–${{ matrix.abi }} ––target uv_a
+          cmake --build build–${{ matrix.abi }}
 
       # 收集输出文件
       - name: Package Artifacts
