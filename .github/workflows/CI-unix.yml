@@ -17,6 +17,9 @@ jobs:
   # 新增：Android 静态库编译任务
   build-android-static:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a, x86, x86_64]
     env:
       NDK_VER: "25.2.9519653"  # 指定稳定版NDK
       ARCH: "arm64"            # 支持修改为 arm/arm64/x86/x86_64
@@ -32,37 +35,34 @@ jobs:
           ndk-version: r25b
 
       # 配置编译环境
-      - name: Set toolchain
+      - name: Configure CMake
         run: |
-          echo "NDK_HOME=$ANDROID_NDK" >> $GITHUB_ENV
-          echo "TOOLCHAIN_DIR=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
-          echo "CC=$TOOLCHAIN_DIR/bin/${ARCH}-linux-android${API_LEVEL}-clang" >> $GITHUB_ENV
-          echo "AR=$TOOLCHAIN_DIR/bin/llvm-ar" >> $GITHUB_ENV
+          cmake -B build-${{ matrix.abi }} \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DANDROID_ABI="${{ matrix.abi }}" \
+            -DANDROID_PLATFORM=android-${{ env.API_LEVEL }} \
+            -DBUILD_SHARED_LIBS=OFF  # 强制编译静态库
 
-      # 精简编译（事件驱动核心）
-      - name: Build static library
+      # 编译静态库
+      - name: Build Static Library
         run: |
-          ./autogen.sh
-          ./configure \
-            --host=${ARCH}-linux-android \
-            --disable-shared \
-            --enable-static \
-            --with-pic \
-            CC="$CC" AR="$AR"
-          make -j$(nproc) libuv.la
+          cmake --build build-${{ matrix.abi }} --target uv
 
-      # 验证输出
-      - name: Verify output
+      # 收集输出文件
+      - name: Package Artifacts
         run: |
-          file .libs/libuv.a
-          echo "✅ 静态库大小: $(du -h .libs/libuv.a | cut -f1)"
+          mkdir -p dist/${{ matrix.abi }}/{lib,include}
+          cp build-${{ matrix.abi }}/libuv.a dist/${{ matrix.abi }}/lib/
+          cp -r include/* dist/${{ matrix.abi }}/include/  # 同步头文件
+          zip -r libuv-android-${{ matrix.abi }}.zip dist/${{ matrix.abi }}/
 
-      # 打包并上传工件[9,11](@ref)
-      - name: Upload artifact
+      # 上传多平台产物
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: libuv-android-static
-          path: .libs/libuv.a
+          name: libuv-android-${{ matrix.abi }}
+          path: libuv-android-${{ matrix.abi }}.zip
           retention-days: 7
           
   
