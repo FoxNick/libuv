@@ -42,7 +42,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DANDROID_ABI="${{ matrix.abi }}" \
             -DANDROID_PLATFORM=android-${{ env.API_LEVEL }} \
-            –DBUILD_SHARED_LIBS=0 \
+            –DBUILD_SHARED_LIBS=1 \
             -DLIBUV_BUILD_SHARED=OFF  # 强制编译静态库
 
       # 编译静态库
