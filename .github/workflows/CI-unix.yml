@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libuv-android-${{ matrix.abi }}
-          path: /home/runner/work/libuv/libuv
+          path: build–${{ matrix.abi }}
           retention-days: 7
           
   
