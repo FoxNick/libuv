@@ -26,7 +26,61 @@ jobs:
       - name: distcheck
         run: |
           make -C build distcheck
+  # 新增：Android 静态库编译任务
+  build-android-static:
+    runs-on: ubuntu-latest
+    env:
+      NDK_VER: "25.2.9519653"  # 指定稳定版NDK
+      ARCH: "arm64"            # 支持修改为 arm/arm64/x86/x86_64
+      API_LEVEL: 24
+    steps:
+      - uses: actions/checkout@v4
 
+      # 设置NDK环境
+      - name: Setup Android NDK
+        uses: android-actions/setup-android-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VER }}
+
+      # 安装编译依赖
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python2.7 automake libtool
+
+      # 配置编译环境
+      - name: Set toolchain
+        run: |
+          echo "NDK_HOME=$ANDROID_NDK" >> $GITHUB_ENV
+          echo "TOOLCHAIN_DIR=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
+          echo "CC=$TOOLCHAIN_DIR/bin/${ARCH}-linux-android${API_LEVEL}-clang" >> $GITHUB_ENV
+          echo "AR=$TOOLCHAIN_DIR/bin/llvm-ar" >> $GITHUB_ENV
+
+      # 精简编译（事件驱动核心）
+      - name: Build static library
+        run: |
+          ./autogen.sh
+          ./configure \
+            --host=${ARCH}-linux-android \
+            --disable-shared \
+            --enable-static \
+            --with-pic \
+            CC="$CC" AR="$AR"
+          make -j$(nproc) libuv.la
+
+      # 验证输出
+      - name: Verify output
+        run: |
+          file .libs/libuv.a
+          echo "✅ 静态库大小: $(du -h .libs/libuv.a | cut -f1)"
+
+      # 打包并上传工件[9,11](@ref)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libuv-android-static
+          path: .libs/libuv.a
+          retention-days: 7
   build-android:
     runs-on: ubuntu-latest
     env:
