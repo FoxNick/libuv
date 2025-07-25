@@ -26,6 +26,7 @@ jobs:
       - name: distcheck
         run: |
           make -C build distcheck
+          
   # 新增：Android 静态库编译任务
   build-android-static:
     runs-on: ubuntu-latest
@@ -81,6 +82,7 @@ jobs:
           name: libuv-android-static
           path: .libs/libuv.a
           retention-days: 7
+          
   build-android:
     runs-on: ubuntu-latest
     env:
