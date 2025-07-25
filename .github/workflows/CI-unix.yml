@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python2.7 automake libtool
+          sudo apt-get install -y python3-distutils automake libtool
 
       # 配置编译环境
       - name: Set toolchain
