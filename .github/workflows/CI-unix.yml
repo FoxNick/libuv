@@ -23,7 +23,7 @@ jobs:
     env:
       NDK_VER: "25.2.9519653"  # 指定稳定版NDK
       ARCH: "arm64"            # 支持修改为 arm/arm64/x86/x86_64
-      API_LEVEL: 21
+      API_LEVEL: 24
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +32,7 @@ jobs:
         id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r25b
+          ndk-version: r24
 
       # 配置编译环境
       - name: Configure CMake
