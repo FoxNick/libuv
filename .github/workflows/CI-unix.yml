@@ -23,7 +23,7 @@ jobs:
     env:
       NDK_VER: "21.4.7075529"  # 指定稳定版NDK
       ARCH: "arm64"            # 支持修改为 arm/arm64/x86/x86_64
-      API_LEVEL: 21
+      API_LEVEL: 24
     steps:
       - uses: actions/checkout@v4
 
