@@ -32,7 +32,7 @@ jobs:
         id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r21
+          ndk-version: r24
 
       # 配置编译环境
       - name: Configure CMake
